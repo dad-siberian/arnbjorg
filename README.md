@@ -1,2 +1,2 @@
 # arnbjorg
- Telegram bot распознающий речь
+ Telegram bot decoding speech
