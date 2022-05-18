@@ -16,12 +16,14 @@ logger = logging.getLogger('VK Bot')
 
 
 def reply(event, vk_api):
-    message = detect_intent_texts(project_id, event.user_id, event.text)
-    vk_api.messages.send(
-        user_id=event.user_id,
-        message=message,
-        random_id=random.randint(1, 1000)
-    )
+    message = detect_intent_texts(
+        project_id, event.user_id, event.text, is_fallback=False)
+    if message:
+        vk_api.messages.send(
+            user_id=event.user_id,
+            message=message,
+            random_id=random.randint(1, 1000)
+        )
 
 
 def main():
