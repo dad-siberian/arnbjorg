@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 import os
 
 from google.cloud import dialogflow
@@ -8,7 +8,23 @@ from google.cloud import dialogflow
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-logger = logging.getLogger('Create intent')
+logger = logging.getLogger('DialogFlow')
+
+with open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')) as file:
+    project_id = json.load(file).get('project_id')
+
+
+def detect_intent_texts(project_id, session_id, texts, language_code='ru-RU'):
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(project_id, session_id)
+    for text in texts.split(' '):
+        text_input = dialogflow.TextInput(
+            text=text, language_code=language_code)
+        query_input = dialogflow.QueryInput(text=text_input)
+        response = session_client.detect_intent(
+            request={"session": session, "query_input": query_input}
+        )
+        return response.query_result.fulfillment_text
 
 
 def create_intent(project_id, display_name, training_phrases_parts, message_texts):
@@ -34,13 +50,11 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 def main():
     with open('questions.json', 'r') as file:
         questions = json.load(file)
-    with open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')) as file:
-        project_id = json.load(file).get('project_id')
-    for question in questions:
-        display_name = question
-        q = questions[question]  # RENAME
-        training_phrases_parts = q.get('questions')
-        message_texts = [q.get('answer')]
+    for сaption in questions:
+        display_name = сaption
+        question = questions.get(сaption)
+        training_phrases_parts = question.get('questions')
+        message_texts = [question.get('answer')]
         create_intent(project_id, display_name,
                       training_phrases_parts, message_texts)
 

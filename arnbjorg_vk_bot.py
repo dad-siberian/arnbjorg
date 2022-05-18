@@ -6,6 +6,8 @@ import vk_api as vk
 from dotenv import load_dotenv
 from vk_api.longpoll import VkEventType, VkLongPoll
 
+from DialogFlow import detect_intent_texts, project_id
+
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -14,9 +16,10 @@ logger = logging.getLogger('VK Bot')
 
 
 def echo(event, vk_api):
+    message = detect_intent_texts(project_id, event.user_id, event.text)
     vk_api.messages.send(
         user_id=event.user_id,
-        message=event.text,
+        message=message,
         random_id=random.randint(1, 1000)
     )
 
