@@ -15,7 +15,7 @@ logging.basicConfig(
 logger = logging.getLogger('VK Bot')
 
 
-def echo(event, vk_api):
+def reply(event, vk_api):
     message = detect_intent_texts(project_id, event.user_id, event.text)
     vk_api.messages.send(
         user_id=event.user_id,
@@ -32,7 +32,7 @@ def main():
     longpoll = VkLongPoll(vk_session)
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-            echo(event, vk_api)
+            reply(event, vk_api)
 
 
 if __name__ == '__main__':
