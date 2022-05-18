@@ -152,3 +152,4 @@ cython_debug/
 #.idea/
 august-terminus-350016-d54b1582f695.json
 questions.json
+.DS_Store
