@@ -24,7 +24,7 @@ async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     )
 
 
-async def echo(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
+async def reply(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
     text = detect_intent_texts(
         project_id, update.effective_chat.id, texts=update.message.text)
     await update.message.reply_text(text)
@@ -36,7 +36,7 @@ def main() -> None:
     application = Application.builder().token(telegram_token).build()
     application.add_handler(CommandHandler('start', start))
     application.add_handler(MessageHandler(
-        filters.TEXT & ~filters.COMMAND, echo))
+        filters.TEXT & ~filters.COMMAND, reply))
     application.run_polling()
 
 
