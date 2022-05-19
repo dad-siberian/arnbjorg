@@ -1,4 +1,4 @@
-import logging
+import logging.config
 import os
 import random
 
@@ -7,12 +7,9 @@ from dotenv import load_dotenv
 from vk_api.longpoll import VkEventType, VkLongPoll
 
 from DialogFlow import detect_intent_texts, project_id
+from setting import LOGGING_CONFIG, TelegramLogsHandler
 
-
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
-logger = logging.getLogger('VK Bot')
+logger = logging.getLogger(__file__)
 
 
 def reply(event, vk_api):
@@ -29,9 +26,16 @@ def reply(event, vk_api):
 def main():
     load_dotenv()
     vk_token = os.getenv('VK_TOKEN')
+    telegram_token = os.getenv('TELEGRAM_TOKEN')
+    chat_id = os.getenv('CHAT_ID')
+
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))
+
     vk_session = vk.VkApi(token=vk_token)
     vk_api = vk_session.get_api()
     longpoll = VkLongPoll(vk_session)
+    logger.info('The arnbjorg VkBot is running')
     for event in longpoll.listen():
         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
             reply(event, vk_api)

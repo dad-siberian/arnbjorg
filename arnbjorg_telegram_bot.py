@@ -1,43 +1,47 @@
-import json
-import logging
+import logging.config
 import os
 
 from dotenv import load_dotenv
-from telegram import ForceReply, Update
-from telegram.ext import (Application, CallbackContext, CommandHandler,
-                          MessageHandler, filters)
+from telegram import Update
+from telegram.ext import (CallbackContext, CommandHandler, Filters,
+                          MessageHandler, Updater)
 
 from DialogFlow import detect_intent_texts, project_id
+from setting import LOGGING_CONFIG, TelegramLogsHandler
+
+logger = logging.getLogger(__file__)
 
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
-logger = logging.getLogger('Telegram Bot')
+def start(update: Update, context: CallbackContext):
+    context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="I'm a bot assistant")
 
 
-async def start(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
-    user = update.effective_user
-    await update.message.reply_html(
-        f'Hi {user.mention_html()}!',
-        reply_markup=ForceReply(selective=True),
-    )
+def reply(update: Update, context: CallbackContext):
+    try:
+        text = detect_intent_texts(
+            project_id, update.effective_chat.id, texts=update.message.text)
+        context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+    except Exception as error:
+        logger.exception(error)
 
 
-async def reply(update: Update, context: CallbackContext.DEFAULT_TYPE) -> None:
-    text = detect_intent_texts(
-        project_id, update.effective_chat.id, texts=update.message.text)
-    await update.message.reply_text(text)
-
-
-def main() -> None:
+def main():
     load_dotenv()
     telegram_token = os.getenv('TELEGRAM_TOKEN')
-    application = Application.builder().token(telegram_token).build()
-    application.add_handler(CommandHandler('start', start))
-    application.add_handler(MessageHandler(
-        filters.TEXT & ~filters.COMMAND, reply))
-    application.run_polling()
+    chat_id = os.getenv('CHAT_ID')
+
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))
+
+    updater = Updater(token=telegram_token, use_context=True)
+    dispatcher = updater.dispatcher
+    dispatcher.add_handler(CommandHandler('start', start))
+    dispatcher.add_handler(MessageHandler(
+        Filters.text & (~Filters.command), reply))
+    logger.info('The arnbjorg Telegram Bot is running')
+    updater.start_polling()
 
 
 if __name__ == '__main__':

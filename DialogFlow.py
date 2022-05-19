@@ -1,14 +1,14 @@
 import json
-import logging
+import logging.config
 import os
 
+from dotenv import load_dotenv
 from google.cloud import dialogflow
 
+from setting import LOGGING_CONFIG, TelegramLogsHandler
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
-logger = logging.getLogger('DialogFlow')
+logger = logging.getLogger(__file__)
+
 
 with open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')) as file:
     project_id = json.load(file).get('project_id')
@@ -52,6 +52,11 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 
 
 def main():
+    load_dotenv()
+    telegram_token = os.getenv('TELEGRAM_TOKEN')
+    chat_id = os.getenv('CHAT_ID')
+    logging.config.dictConfig(LOGGING_CONFIG)
+    logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))
     with open('questions.json', 'r') as file:
         questions = json.load(file)
     for сaption in questions:
@@ -59,8 +64,11 @@ def main():
         question = questions.get(сaption)
         training_phrases_parts = question.get('questions')
         message_texts = [question.get('answer')]
-        create_intent(project_id, display_name,
-                      training_phrases_parts, message_texts)
+        try:
+            create_intent(project_id, display_name,
+                          training_phrases_parts, message_texts)
+        except Exception as error:
+            logger.exception(error)
 
 
 if __name__ == '__main__':
