@@ -95,6 +95,19 @@ pytnon arnbjorg_telegram_bot.py
 pytnon arnbjorg_vk_bot.py
 ```
 
+## Запуск бота на сервере
+
+Для постоянной работы бота необходимо запустить на сервере, например на [Heroku: Cloud Application Platform](https://www.heroku.com).
+На сайте есть подробная [инструкция](https://devcenter.heroku.com/articles/getting-started-with-python).
+
+
+Переменные окружения передаются на сервер командой
+```
+heroku config:set TELEGRAM_TOKEN={telegram token}
+```
+
+Для работы с Heroku на территории РФ может понадобиться VPN
+
 ## Цели проекта
 
 Код написан в образовательных целях на онлайн-курсе для веб-разработчиков [dvmn.org](https://dvmn.org/).
