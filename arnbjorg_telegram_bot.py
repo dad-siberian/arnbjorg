@@ -7,7 +7,7 @@ from telegram.ext import (CallbackContext, CommandHandler, Filters,
                           MessageHandler, Updater)
 
 from DialogFlow import detect_intent_texts, project_id
-from setting import LOGGING_CONFIG, TelegramLogsHandler
+from log_config import LOGGING_CONFIG, TelegramLogsHandler
 
 logger = logging.getLogger(__file__)
 

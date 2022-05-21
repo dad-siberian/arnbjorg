@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from google.cloud import dialogflow
 
-from setting import LOGGING_CONFIG, TelegramLogsHandler
+from log_config import LOGGING_CONFIG, TelegramLogsHandler
 
 logger = logging.getLogger(__file__)
 

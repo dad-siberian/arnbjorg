@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from vk_api.longpoll import VkEventType, VkLongPoll
 
 from DialogFlow import detect_intent_texts, project_id
-from setting import LOGGING_CONFIG, TelegramLogsHandler
+from log_config import LOGGING_CONFIG, TelegramLogsHandler
 
 logger = logging.getLogger(__file__)
 
