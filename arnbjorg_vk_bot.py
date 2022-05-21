@@ -27,7 +27,7 @@ def main():
     load_dotenv()
     vk_token = os.getenv('VK_TOKEN')
     telegram_token = os.getenv('TELEGRAM_TOKEN')
-    chat_id = os.getenv('CHAT_ID')
+    chat_id = os.getenv('TG_CHAT_ID')
 
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))

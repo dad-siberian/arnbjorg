@@ -30,7 +30,7 @@ def reply(update: Update, context: CallbackContext):
 def main():
     load_dotenv()
     telegram_token = os.getenv('TELEGRAM_TOKEN')
-    chat_id = os.getenv('CHAT_ID')
+    chat_id = os.getenv('TG_CHAT_ID')
 
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))

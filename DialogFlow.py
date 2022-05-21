@@ -54,7 +54,7 @@ def create_intent(project_id, display_name, training_phrases_parts, message_text
 def main():
     load_dotenv()
     telegram_token = os.getenv('TELEGRAM_TOKEN')
-    chat_id = os.getenv('CHAT_ID')
+    chat_id = os.getenv('TG_CHAT_ID')
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))
     with open('questions.json', 'r') as file:
