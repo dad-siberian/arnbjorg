@@ -2,6 +2,7 @@ import json
 import logging.config
 import os
 
+import google.auth
 from dotenv import load_dotenv
 from google.cloud import dialogflow
 
@@ -10,25 +11,19 @@ from log_config import LOGGING_CONFIG, TelegramLogsHandler
 logger = logging.getLogger(__file__)
 
 
-with open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')) as file:
-    project_id = json.load(file).get('project_id')
-
-
-def detect_intent_texts(project_id, session_id, texts, language_code='ru-RU', is_fallback=True):
+def detect_intent_texts(project_id, session_id, text, language_code='ru-RU'):
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
-    for text in texts.split(' '):
-        text_input = dialogflow.TextInput(
-            text=text, language_code=language_code)
-        query_input = dialogflow.QueryInput(text=text_input)
-        response = session_client.detect_intent(
-            request={"session": session, "query_input": query_input}
-        )
-        if is_fallback:
-            return response.query_result.fulfillment_text
-        else:
-            if not response.query_result.intent.is_fallback:
-                return response.query_result.fulfillment_text
+    text_input = dialogflow.TextInput(
+        text=text, language_code=language_code)
+    query_input = dialogflow.QueryInput(text=text_input)
+    response = session_client.detect_intent(
+        request={"session": session, "query_input": query_input}
+    )
+    return {
+        'is_fallback': response.query_result.intent.is_fallback,
+        'fulfillment_text': response.query_result.fulfillment_text,
+    }
 
 
 def create_intent(project_id, display_name, training_phrases_parts, message_texts):
@@ -55,11 +50,11 @@ def main():
     load_dotenv()
     telegram_token = os.getenv('TELEGRAM_TOKEN')
     chat_id = os.getenv('TG_CHAT_ID')
+    credentials, project_id = google.auth.default()
     logging.config.dictConfig(LOGGING_CONFIG)
     logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))
     with open('questions.json', 'r') as file:
         questions = json.load(file)
-
     for display_name, question in questions.items():
         training_phrases_parts = question.get('questions')
         message_texts = [question.get('answer')]

@@ -1,12 +1,13 @@
 import logging.config
 import os
 
+import google.auth
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import (CallbackContext, CommandHandler, Filters,
                           MessageHandler, Updater)
 
-from DialogFlow import detect_intent_texts, project_id
+from DialogFlow import detect_intent_texts
 from log_config import LOGGING_CONFIG, TelegramLogsHandler
 
 logger = logging.getLogger(__file__)
@@ -20,9 +21,15 @@ def start(update: Update, context: CallbackContext):
 
 def reply(update: Update, context: CallbackContext):
     try:
-        text = detect_intent_texts(
-            project_id, update.effective_chat.id, texts=update.message.text)
-        context.bot.send_message(chat_id=update.effective_chat.id, text=text)
+        fulfillment_text = detect_intent_texts(
+            project_id=google.auth.default()[1],
+            session_id=update.effective_chat.id,
+            text=update.message.text
+        )
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=fulfillment_text.get('fulfillment_text')
+        )
     except Exception as error:
         logger.exception(error)
 
