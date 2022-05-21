@@ -59,9 +59,8 @@ def main():
     logger.addHandler(TelegramLogsHandler(telegram_token, chat_id))
     with open('questions.json', 'r') as file:
         questions = json.load(file)
-    for сaption in questions:
-        display_name = сaption
-        question = questions.get(сaption)
+
+    for display_name, question in questions.items():
         training_phrases_parts = question.get('questions')
         message_texts = [question.get('answer')]
         try:
